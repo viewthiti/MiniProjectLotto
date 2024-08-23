@@ -29,7 +29,7 @@ router.post("/login", (req, res) => {
       const Users = result[0];
       res.json({
         message: "Match found",
-        result,
+        Users,
       });
     } else {
       res.json({ message: "No match found" });
