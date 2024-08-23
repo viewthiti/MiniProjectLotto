@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors";
 import { router as user } from "./api/user";
+import { router as wallet } from "./api/wallet";
 
 export const app = express();
+app.use(express.json());
 // app.use("/", (req, res) => {
 //   res.send("Hello World!!! ei");
 // });
@@ -13,3 +15,7 @@ app.use(
   })  
 );
 app.use("", user);
+app.use("/w", wallet);
+
+
+
