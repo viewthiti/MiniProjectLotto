@@ -37,44 +37,44 @@ router.post("/login", (req, res) => {
   });
 });
 
-//insert amount ยังไม่ได้
-router.post("/register", (req, res) => {
-  // Rece data and convert to model
-  const users: Users = req.body;
-  const wallet: WalletGetResponse = req.body;
+// //insert amount ยังไม่ได้
+// router.post("/register", (req, res) => {
+//   // Rece data and convert to model
+//   const users: Users = req.body;
+//   const wallet: WalletGetResponse = req.body;
 
-  let sql =
-    "INSERT INTO `Users`(`username`, `phone`, `email`, `password`, `img`, `typeID`) VALUES (?,?,?,?,?,?)";
+//   let sql =
+//     "INSERT INTO `Users`(`username`, `phone`, `email`, `password`, `img`, `typeID`) VALUES (?,?,?,?,?,?)";
 
-  sql = mysql.format(sql, [
-    users.username,
-    users.phone,
-    users.email,
-    users.password,
-    null,
-    1,
-  ]);
+//   sql = mysql.format(sql, [
+//     users.username,
+//     users.phone,
+//     users.email,
+//     users.password,
+//     null,
+//     1,
+//   ]);
 
-  conn.query(sql, (err, result) => {
-    if (err) throw err;
-    const userID = result.insertId;
+//   conn.query(sql, (err, result) => {
+//     if (err) throw err;
+//     const userID = result.insertId;
 
-    // สร้างคำสั่ง SQL สำหรับ Wallet
-    let sql1 =
-      "INSERT INTO `Wallet`(`userID`, `amount`, `transactionDate`) VALUES (?,?,?)";
-    sql1 = mysql.format(sql1, [userID, wallet.amount, Date.now()]);
+//     // สร้างคำสั่ง SQL สำหรับ Wallet
+//     let sql1 =
+//       "INSERT INTO `Wallet`(`userID`, `amount`, `transactionDate`) VALUES (?,?,?)";
+//     sql1 = mysql.format(sql1, [userID, wallet.amount, Date.now()]);
 
-    // ส่งข้อมูลกระเป๋าเงินไปยังฐานข้อมูล
-    conn.query(sql1, (err1, result1) => {
-      if (err1) throw err1;
+//     // ส่งข้อมูลกระเป๋าเงินไปยังฐานข้อมูล
+//     conn.query(sql1, (err1, result1) => {
+//       if (err1) throw err1;
 
-      // ส่งคืนข้อมูล
-      res.status(201).json({
-        affected_rows_users: result.affectedRows,
-        last_idx_users: result.insertId,
-        affected_rows_wallet: result1.affectedRows,
-        last_idx_wallet: result1.insertId,
-      });
-    });
-  });
-});
+//       // ส่งคืนข้อมูล
+//       res.status(201).json({
+//         affected_rows_users: result.affectedRows,
+//         last_idx_users: result.insertId,
+//         affected_rows_wallet: result1.affectedRows,
+//         last_idx_wallet: result1.insertId,
+//       });
+//     });
+//   });
+// });
