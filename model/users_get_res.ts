@@ -4,6 +4,7 @@ export interface Users {
     email:    string;
     password: string;
     img:  string;
-    typeID:   number;     
+    typeID:   number;   
+    confirmPassword: string;
 }
 
