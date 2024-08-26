@@ -5,7 +5,7 @@ import mysql from "mysql";
 import { WalletGetResponse } from "../model/wallet_get_res";
 
 export const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 
 router.get("/Users", (req, res) => {
   conn.query("select * from Users", (err, result, fields) => {
