@@ -78,3 +78,23 @@ router.post("/register", (req, res) => {
     });
   });
 });
+
+//ลบบัญชีผู้ใช้
+router.delete("/delete/:id", (req, res) => {
+  const  userId  = req.params.id;
+
+  const sql = "DELETE FROM Users WHERE userID = ?";
+
+  conn.query(sql, [userId], (err, result) => {
+    if (err) {
+      res.status(500).json({ message: "error" });
+      return;
+    }
+
+    if (result.affectedRows > 0) {
+      res.json({
+        message: "User deleted successfully",
+      });
+    } 
+  });
+});

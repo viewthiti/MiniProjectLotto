@@ -15,8 +15,8 @@ app.use(bodyParser.json());
 // });
 app.use(
   cors({
-    origin: "*",
-    // origin: "http://localhost:4200",
+    // origin: "*",
+    origin: "http://localhost:4200",
   })  
 );
 app.use("", user);
