@@ -13,36 +13,6 @@ router.get("/Users", (req, res) => {
   });
 });
 
-// Login
-router.post("/login", (req, res) => {
-  const { phone } = req.body;
-  const { password } = req.body;
-
-  const sql = "SELECT * FROM Users WHERE phone = ? AND password = ?";
-
-  conn.query(sql, [phone, password], async (err, result, fields) => {
-    if (err) {
-      res.status(500).json({ message: "An error occurred" });
-      return;
-    }
-
-    if (result.length > 0) {
-      const Users = result[0];
-      const match = await bcrypt.compare(password, Users.password);
-      if (match) {
-        res.json({
-          message: "Match found",
-          Users,
-        });
-      } else {
-        // รหัสผ่านไม่ถูกต้อง
-        res.status(401).json({ message: "Invalid phone or password" });
-      }
-    } else {
-      res.json({ message: "No match found" });
-    }
-  });
-});
 
 router.post("/login", (req, res) => {
   const { phone, password } = req.body;
