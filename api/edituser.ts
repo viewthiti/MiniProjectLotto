@@ -2,9 +2,26 @@ import express from "express";
 import { conn, queryAsync } from "../dbconnect";
 import mysql from "mysql";
 import { editUsers } from "../model/edit_get_res";
+import { log } from "console";
 
 
 export const router = express.Router();
+
+//ดึงข้อมูลมาโชว์
+router.get("/:userID", (req, res) => {
+  const userID = +req.params.userID;
+  const sql = "select userID, username, phone, email  from Users where userID = ?";
+  // log(userID);
+  conn.query(sql, [userID], (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+    res.json(result[0]);
+  });
+ 
+});
 
 // เเก้ไขชื่อ
 router.put("/:userID", async (req, res) => {
