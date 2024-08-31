@@ -83,6 +83,7 @@ router.post("/lottoWin", (req, res) => {
   });
 });
 
+
 function lottoWinAll() {
   const prizes = [];
   const numPrizes = 5; // จำนวนรางวัล
