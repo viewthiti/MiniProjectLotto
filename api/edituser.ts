@@ -87,7 +87,7 @@ router.put("/:userID", async (req, res) => {
   
       const updateprofile = { ...UsersOriginal, ...profile };
       sql =
-        "update  `Users` set `username`=?, `phone`=?, `email`=?,`email`=? where `userID`=?";
+        "update  `Users` set `username`=?, `phone`=?, `email`=? where `userID`=?";
   
       sql = mysql.format(sql, [
         updateprofile.username,
@@ -111,5 +111,4 @@ router.put("/:userID", async (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     }
   });
-
-
+  
