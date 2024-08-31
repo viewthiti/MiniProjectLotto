@@ -28,13 +28,14 @@ router.post("/login", (req, res) => {
 
     // หากพบผู้ใช้
     if (result.length > 0) {
-      const user = result[0];
+      const Users = result[0];
       // เปรียบเทียบรหัสผ่านที่ป้อนกับรหัสผ่านที่ถูกแฮช
-      const match = await bcrypt.compare(password, user.password);
+      const match = await bcrypt.compare(password, Users.password);
       if (match) {
         res.json({
           message: "Match found",
-          user,
+          Users,
+          // Users: Users.tojson(),
         });
       } else {
         // รหัสผ่านไม่ถูกต้อง
