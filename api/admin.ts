@@ -118,16 +118,16 @@ function lottoWinSold(): Promise<string[]> {
 
       // Check if there are at least 5 purchased numbers
       if (soldNumbers.length < numPrizes) {
-        return reject(
-          new Error("Not enough purchased numbers to draw prizes.")
-        ); // Reject if less than 5 numbers
+        return reject; // Reject if less than 5 numbers
       }
 
       const prizes: string[] = [];
+      const availableNumbers = [...soldNumbers]; // Create a copy of soldNumbers
 
       for (let i = 0; i < numPrizes; i++) {
-        const randomIndex = Math.floor(Math.random() * soldNumbers.length);
-        prizes.push(soldNumbers[randomIndex]);
+        const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+        prizes.push(availableNumbers[randomIndex]); // Select a number
+        availableNumbers.splice(randomIndex, 1); // Remove the selected number to avoid duplicates
       }
 
       resolve(prizes); // Return the selected winning numbers
