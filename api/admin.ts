@@ -118,7 +118,7 @@ function lottoWinSold(): Promise<string[]> {
 
       // Check if there are at least 5 purchased numbers
       if (soldNumbers.length < numPrizes) {
-        return reject; // Reject if less than 5 numbers
+        return reject(null); // Reject if less than 5 numbers
       }
 
       const prizes: string[] = [];
