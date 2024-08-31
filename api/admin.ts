@@ -107,37 +107,46 @@ function lottoWinAll() {
 }
 
 function lottoWinSold(): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    const sql =
-      "SELECT lottoNumber FROM PurchasedLotto WHERE DATE(purchaseDate) = CURDATE()";
-
-    conn.query(sql, (err, result) => {
-      if (err) {
-        console.error("Error fetching purchased lotto numbers:", err);
-        return reject(err); // Return error if there's a problem with the query
-      }
-
-      const soldNumbers = result.map(
-        (item: { lottoNumber: any }) => item.lottoNumber
-      );
-
-      const numPrizes = 5; // Number of prizes
-
-      // Check if there are at least 5 purchased numbers
-      if (soldNumbers.length < numPrizes) {
-        return reject(
-          new Error("Not enough purchased numbers to draw prizes.")
-        ); // Reject if less than 5 numbers
-      }
-
-      const prizes: string[] = [];
-
-      for (let i = 0; i < numPrizes; i++) {
-        const randomIndex = Math.floor(Math.random() * soldNumbers.length);
-        prizes.push(soldNumbers[randomIndex]);
-      }
-
-      resolve(prizes); // Return the selected winning numbers
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT DISTINCT lottoNumber FROM PurchasedLotto WHERE DATE(purchaseDate) = CURDATE()";
+  
+      conn.query(sql, (err, result) => {
+        if (err) {
+          console.error("Error fetching purchased lotto numbers:", err);
+          return reject(err); // Return error if there's a problem with the query
+        }
+  
+        const soldNumbers = result.map(
+          (item: { lottoNumber: any }) => item.lottoNumber as string // Type assertion to string
+        );
+  
+        const numPrizes = 5; // Number of prizes
+  
+        // Remove duplicates using a Set
+        const uniqueSoldNumbers = Array.from(new Set(soldNumbers));
+  
+        // Check if there are at least 5 unique purchased numbers
+        if (uniqueSoldNumbers.length < numPrizes) {
+          return reject(null); // Reject if less than 5 unique numbers
+        }
+  
+        const prizes: string[] = [];
+        const selectedNumbers = new Set<string>(); // Specify the Set type as string
+  
+        while (prizes.length < numPrizes) {
+          const randomIndex = Math.floor(Math.random() * uniqueSoldNumbers.length);
+          const selectedNumber = uniqueSoldNumbers[randomIndex] as string; // Type assertion to string
+  
+          // Check if the selected number is already chosen
+          if (!selectedNumbers.has(selectedNumber)) {
+            prizes.push(selectedNumber); // Add to prizes
+            selectedNumbers.add(selectedNumber); // Add to selected numbers to avoid duplicates
+          }
+        }
+  
+        resolve(prizes); // Return the selected winning numbers
+      });
     });
-  });
-}
+  }
+  
+  
