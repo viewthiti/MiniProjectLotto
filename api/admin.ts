@@ -16,15 +16,15 @@ router.get("/admin", (req, res) => {
   );
 });
 
-router.get("/random", async (req, res) => {
-  try {
-    const winningNumbers = await lottoWinSold(); // สุ่มหมายเลขล็อตเตอรี่
-    res.status(200).json({ winningNumbers }); // ส่งหมายเลขกลับไปยังไคลเอนต์
-  } catch (error) {
-    console.error("Error generating winning numbers:", error);
-    res.status(500).json({ error: "Failed to generate winning numbers" });
-  }
-});
+// router.get("/random", async (req, res) => {
+//   try {
+//     const winningNumbers = await lottoWinSold(); // สุ่มหมายเลขล็อตเตอรี่
+//     res.status(200).json({ winningNumbers }); // ส่งหมายเลขกลับไปยังไคลเอนต์
+//   } catch (error) {
+//     console.error("Error generating winning numbers:", error);
+//     res.status(500).json({ error: "Failed to generate winning numbers" });
+//   }
+// });
 
 // router.get("/dateNow", (req, res) => {
 //   conn.query(
