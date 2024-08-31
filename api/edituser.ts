@@ -65,6 +65,7 @@ router.put("/:userID", async (req, res) => {
       console.error('Error:', err);
       res.status(500).json({ error: 'An error occurred' });
     }
+    
   });
 
 

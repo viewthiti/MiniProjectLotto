@@ -16,15 +16,15 @@ router.get("/admin", (req, res) => {
   );
 });
 
-router.get("/random", async (req, res) => {
-  try {
-    const winningNumbers = await lottoWinSold(); // สุ่มหมายเลขล็อตเตอรี่
-    res.status(200).json({ winningNumbers }); // ส่งหมายเลขกลับไปยังไคลเอนต์
-  } catch (error) {
-    console.error("Error generating winning numbers:", error);
-    res.status(500).json({ error: "Failed to generate winning numbers" });
-  }
-});
+// router.get("/random", async (req, res) => {
+//   try {
+//     const winningNumbers = await lottoWinSold(); // สุ่มหมายเลขล็อตเตอรี่
+//     res.status(200).json({ winningNumbers }); // ส่งหมายเลขกลับไปยังไคลเอนต์
+//   } catch (error) {
+//     console.error("Error generating winning numbers:", error);
+//     res.status(500).json({ error: "Failed to generate winning numbers" });
+//   }
+// });
 
 // router.get("/dateNow", (req, res) => {
 //   conn.query(
@@ -59,29 +59,37 @@ router.get("/random", async (req, res) => {
   }
 });
 
+//insert เลขที่สุ่มเเล้ว
 router.post("/lottoWin", (req, res) => {
-  let sql =
-    "INSERT INTO `AdminDraws`(`winningNumber`, `prizeType`, `drawDate`) VALUES (?,?,?)";
-  const darwDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const { winningNumbers } = req.body; // รับค่าจาก body
+  const drawDate = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-  winningNumbers.forEach((index) => {
-    const prizeType = index + 1;
-    sql = mysql.format(sql, [winningNumbers, prizeType, darwDate]);
+  if (!Array.isArray(winningNumbers) || winningNumbers.some(num => typeof num !== 'string')) {
+    return res.status(400).json({ error: "Invalid data format" });
+  }
 
-    conn.query(sql, (err, result) => {
-      if (err) {
-        console.error("Error inserting into AdminDraws:", err);
-        return res.status(500).json({ error: "Database error" });
-      }
+  // แปลงสตริงเป็นตัวเลข
+  const numbers = winningNumbers.map(num => parseInt(num, 10));
 
-      // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
-      res.status(201).json({
-        affected_rows_AdminDraws: result.affectedRows,
-        last_idx_AdminDraws: result.insertId,
-      });
+  // เตรียมคำสั่ง SQL สำหรับการแทรกหลายแถว
+  const sql = "INSERT INTO `AdminDraws`(`winningNumber`, `prizeType`, `drawDate`) VALUES ?";
+  const values = numbers.map((number, index) => [number, index + 1, drawDate]);
+
+  conn.query(sql, [values], (err, result) => {
+    if (err) {
+      console.error("Error inserting into AdminDraws:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
+    res.status(201).json({
+      affected_rows_AdminDraws: result.affectedRows,
+      last_idx_AdminDraws: result.insertId,
     });
   });
 });
+
+
 
 function lottoWinAll() {
   const prizes = [];

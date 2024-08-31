@@ -4,6 +4,7 @@ import { router as user } from "./api/user";
 import { router as wallet } from "./api/wallet";
 import { router as edituser } from "./api/edituser";
 import { router as admin } from "./api/admin";
+import { router as order } from "./api/order";
 
 
 import bodyParser from "body-parser";
@@ -26,7 +27,10 @@ app.use(
 app.use("", user);
 app.use("/w", wallet);
 app.use("/edit", edituser);
+app.use("/users", edituser);
 app.use("/admin", admin);
+app.use("/order", order);
+
 
 
 
