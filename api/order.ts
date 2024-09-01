@@ -26,7 +26,7 @@ function lottoRandom() {
   return prizes;
 }
 
-//insert เลขที่ซื้อในตะกร้าโดยที่ยังไม่หักเงิน 
+//insert เลขที่ซื้อในตะกร้าโดยที่หักเงินเเล้ว 
 router.post("/lottoBuy/:userID", (req, res) => {
   const userID = +req.params.userID;
   const { lottoNumber } = req.body; 
