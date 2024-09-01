@@ -29,7 +29,7 @@ function lottoRandom() {
 //insert เลขที่ซื้อในตะกร้าโดยที่ยังไม่หักเงิน 
 router.post("/lottoBuy/:userID", (req, res) => {
   const userID = +req.params.userID;
-  const { lottoNumber } = req.body; // รับค่าจาก body
+  const { lottoNumber } = req.body; 
   const purchaseDate = new Date().toISOString().slice(0, 19).replace("T", " ");
   const cost = 120; 
 
@@ -55,7 +55,7 @@ router.post("/lottoBuy/:userID", (req, res) => {
     log(walletAmount);
 
     if (walletAmount < cost) {
-      // ยอดเงินไม่เพียงพอ
+      // ยอดเงินไม่พอเด้อ
       return res.status(400).json({ error: "Insufficient funds" });
     }
 
@@ -68,11 +68,11 @@ router.post("/lottoBuy/:userID", (req, res) => {
       }
 
       if (result.length > 0) {
-        // หากพบเลขล็อตเตอรี่ที่ซ้ำ
+        // พบเลขที่ซ้ำ
         return res.status(400).json({ error: "Lotto number already purchased" });
       }
 
-      // หากไม่พบเลขล็อตเตอรี่ที่ซ้ำ ให้ทำการแทรกข้อมูล
+      // หากไม่พบเลขที่ซ้ำ ให้ทำการแทรกข้อมูล
       const insertLottoSql = "INSERT INTO `PurchasedLotto`(`userID`, `lottoNumber`, `purchaseDate`) VALUES (?, ?, ?)";
       conn.query(insertLottoSql, [userID, lottoNumber, purchaseDate], (err, result) => {
         if (err) {
