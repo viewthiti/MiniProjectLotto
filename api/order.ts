@@ -5,6 +5,22 @@ import mysql from "mysql";
 export const router = express.Router();
 let winningNumbers: string[] = [];
 
+
+//ดึงข้อมูลPurchasedLottoออกมาโชว์
+router.get("/PurchasedLotto", (req, res) => {
+  const sql = "SELECT lottoNumber FROM PurchasedLotto";
+  
+  conn.query(sql, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "An error occurred while fetching data" });
+      return;
+    }
+
+    res.json(result);
+  });
+});
+
 router.get("/random", (req, res) => {
   winningNumbers = lottoRandom(); // Generates random lottery numbers
   res.status(200).json({ winningNumbers }); // Sends the numbers back to the client
