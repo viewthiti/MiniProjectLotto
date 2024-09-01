@@ -6,6 +6,22 @@ import { log } from "console";
 export const router = express.Router();
 let winningNumbers: string[] = [];
 
+
+//ดึงข้อมูลPurchasedLottoออกมาโชว์
+router.get("/PurchasedLotto", (req, res) => {
+  const sql = "SELECT lottoNumber FROM PurchasedLotto";
+  
+  conn.query(sql, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ message: "An error occurred while fetching data" });
+      return;
+    }
+
+    res.json(result);
+  });
+});
+
 router.get("/random", (req, res) => {
   winningNumbers = lottoRandom(); // Generates random lottery numbers
   res.status(200).json({ winningNumbers }); // Sends the numbers back to the client
@@ -26,7 +42,7 @@ function lottoRandom() {
   return prizes;
 }
 
-//insert เลขที่ซื้อในตะกร้าโดยที่ยังไม่หักเงิน 
+//insert เลขที่ซื้อในตะกร้าโดยที่หักเงินเเล้ว 
 router.post("/lottoBuy/:userID", (req, res) => {
   const userID = +req.params.userID;
   const { lottoNumber } = req.body; 
@@ -56,7 +72,7 @@ router.post("/lottoBuy/:userID", (req, res) => {
 
     if (walletAmount < cost) {
       // ยอดเงินไม่พอเด้อ
-      return res.status(400).json({ error: "Insufficient funds" });
+      return res.status(300).json({ error: "Insufficient funds" });
     }
 
     // ตรวจสอบว่าเลขล็อตเตอรี่ซ้ำ
