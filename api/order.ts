@@ -56,7 +56,7 @@ router.post("/lottoBuy/:userID", (req, res) => {
 
     if (walletAmount < cost) {
       // ยอดเงินไม่พอเด้อ
-      return res.status(400).json({ error: "Insufficient funds" });
+      return res.status(300).json({ error: "Insufficient funds" });
     }
 
     // ตรวจสอบว่าเลขล็อตเตอรี่ซ้ำ
