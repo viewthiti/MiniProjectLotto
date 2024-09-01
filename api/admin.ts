@@ -138,11 +138,27 @@ function lottoWinSold(): Promise<string[]> {
 }
 
 //ดึงข้อมูลมางวดล่าสุดไปหน้า Home
+const moment = require('moment'); // นำเข้า moment.js
+require('moment/locale/th'); // นำเข้า locale ภาษาไทย
+
 router.get("/drawsNow", (req, res) => {
   conn.query(
     "SELECT * FROM AdminDraws ORDER BY drawID DESC LIMIT 5",
     (err, result, fields) => {
+      if (err) throw err;
+
+      // กำหนด type ให้กับ result ว่าเป็น array ของ objects
+      result = result.map((draw: { drawDate: string }) => {
+        // ปรับปีจาก ค.ศ. เป็น พ.ศ.
+        let drawDate = moment(draw.drawDate);
+        let yearBuddhistEra = drawDate.year() + 543;
+        draw.drawDate = drawDate.format(`DD MMMM ${yearBuddhistEra}`);
+        return draw;
+      });
+
       res.json(result);
     }
   );
 });
+
+
