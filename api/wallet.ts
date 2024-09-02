@@ -19,7 +19,7 @@ router.get("/total/:userID", (req, res) => {
     return res.status(400).json({ error: 'userID is required' });
   }
 
-  const sumWalletSql = "SELECT SUM(amount) AS total FROM Wallet WHERE userID = ?";
+  const sumWalletSql = "SELECT U.username, SUM(W.amount) AS total FROM Wallet W INNER JOIN Users U ON W.userID = U.userID WHERE W.userID = ? GROUP BY U.username"; // เพิ่ม GROUP BY
 
   conn.query(sumWalletSql, [userID], (err, result) => {
     if (err) {
@@ -27,14 +27,15 @@ router.get("/total/:userID", (req, res) => {
       return res.status(500).json({ error: "Database error" });
     }
 
-    const total = result[0].total || 0;
+    // ส่งคืนเป็นรายการ
+    const response = result.map((row: { username: any; total: any; }) => ({
+      username: row.username,
+      total: row.total || 0,
+    }));
 
-    return res.status(200).json({ total });
+    return res.status(200).json(response); // ส่งคืนข้อมูลในรูปแบบรายการ
   });
 });
-
-
-
 
 //เติมเงิน
 router.post("/add/:userID", (req, res) =>  {
@@ -101,12 +102,12 @@ router.post("/withdraw/:userID", (req, res) => {
   });
 });
 
+//ธุรกรรม
 router.get("/transaction", (req, res) => {
   const userID = req.query.userID; // Assuming you're passing the userID as a query parameter
-  const limit = 10;
 
-  const sql = "SELECT * FROM Wallet WHERE userID = ? ORDER BY transactionDate DESC LIMIT ?";
-  const formattedSql = mysql.format(sql, [userID, limit]);
+  const sql = "SELECT * FROM Wallet WHERE userID = ? ORDER BY transactionDate DESC LIMIT 10";
+  const formattedSql = mysql.format(sql, [userID]);
 
   conn.query(formattedSql, (err, result, fields) => {
     if (err) throw err;
