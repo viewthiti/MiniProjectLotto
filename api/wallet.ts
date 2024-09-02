@@ -2,6 +2,7 @@ import express from "express";
 import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { WalletGetResponse } from "../model/wallet_get_res";
+import moment from "moment";
 
 export const router = express.Router();
 
@@ -106,12 +107,22 @@ router.post("/withdraw/:userID", (req, res) => {
 router.get("/transaction", (req, res) => {
   const userID = req.query.userID; // Assuming you're passing the userID as a query parameter
 
-  const sql = "SELECT * FROM Wallet WHERE userID = ? ORDER BY transactionDate DESC LIMIT 10";
+  const sql = "SELECT * FROM Wallet WHERE userID = ? ORDER BY transactionID DESC LIMIT 10";
   const formattedSql = mysql.format(sql, [userID]);
 
   conn.query(formattedSql, (err, result, fields) => {
     if (err) throw err;
+
+    // กำหนด type ให้กับ result ว่าเป็น array ของ objects
+    result = result.map((transaction: { transactionDate: string }) => {
+      // ปรับปีจาก ค.ศ. เป็น พ.ศ.
+      let transactionDate = moment(transaction.transactionDate);
+      let yearBuddhistEra = transactionDate.year() + 543;
+      transaction.transactionDate = transactionDate.format(`DD MMMM ${yearBuddhistEra}`);
+      return transaction;
+    });
     res.json(result);
-  });
+  })
+  
 });
 
