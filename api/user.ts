@@ -79,6 +79,10 @@ router.post("/register", (req, res) => {
       return res.status(409).json({ errors });
     }
 
+    if (wallet.amount < 500) {
+      return res.status(403).json({ error: "Wallet amount must be greater than 500." });
+    }
+
     // ถ้าอีเมลไม่อยู่ในฐานข้อมูล ให้ทำการลงทะเบียนผู้ใช้ใหม่
     try {
       const hashedPassword = await bcrypt.hash(users.password, 10);
