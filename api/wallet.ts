@@ -19,12 +19,7 @@ router.get("/total/:userID", (req, res) => {
     return res.status(400).json({ error: 'userID is required' });
   }
 
-  const sumWalletSql = `
-    SELECT U.username, SUM(W.amount) AS total 
-    FROM Wallet W
-    INNER JOIN Users U ON W.userID = U.userID 
-    WHERE W.userID = ?
-  `;
+  const sumWalletSql = "SELECT U.username, SUM(W.amount) AS total FROM Wallet W INNER JOIN Users U ON W.userID = U.userID WHERE W.userID = ? GROUP BY U.username"; // เพิ่ม GROUP BY
 
   conn.query(sumWalletSql, [userID], (err, result) => {
     if (err) {
@@ -32,16 +27,15 @@ router.get("/total/:userID", (req, res) => {
       return res.status(500).json({ error: "Database error" });
     }
 
-    const total = result[0].total || 0;
-    const username = result[0].username || '';
+    // ส่งคืนเป็นรายการ
+    const response = result.map((row: { username: any; total: any; }) => ({
+      username: row.username,
+      total: row.total || 0,
+    }));
 
-    return res.status(200).json({ username, total });
+    return res.status(200).json(response); // ส่งคืนข้อมูลในรูปแบบรายการ
   });
 });
-
-
-
-
 
 //เติมเงิน
 router.post("/add/:userID", (req, res) =>  {
