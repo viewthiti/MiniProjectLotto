@@ -46,6 +46,10 @@ router.post("/add/:userID", (req, res) =>  {
     return res.status(400).json({ error: 'userID and amount are required' });
   }
 
+  if (amount < 500) {
+    return res.status(403).json({ error: 'Wallet amount must be greater than 500.' });
+  }
+
   const purchaseDate = new Date();  // Get the current date
   const insertWalletSql = "INSERT INTO Wallet (userID, amount, transactionDate) VALUES (?, ?, ?)";
 
@@ -96,3 +100,17 @@ router.post("/withdraw/:userID", (req, res) => {
     });
   });
 });
+
+router.get("/transaction", (req, res) => {
+  const userID = req.query.userID; // Assuming you're passing the userID as a query parameter
+  const limit = 10;
+
+  const sql = "SELECT * FROM Wallet WHERE userID = ? ORDER BY transactionDate DESC LIMIT ?";
+  const formattedSql = mysql.format(sql, [userID, limit]);
+
+  conn.query(formattedSql, (err, result, fields) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
+
