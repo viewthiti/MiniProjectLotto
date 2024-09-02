@@ -102,12 +102,12 @@ router.post("/withdraw/:userID", (req, res) => {
   });
 });
 
+//ธุรกรรม
 router.get("/transaction", (req, res) => {
   const userID = req.query.userID; // Assuming you're passing the userID as a query parameter
-  const limit = 10;
 
-  const sql = "SELECT * FROM Wallet WHERE userID = ? ORDER BY transactionDate DESC LIMIT ?";
-  const formattedSql = mysql.format(sql, [userID, limit]);
+  const sql = "SELECT * FROM Wallet WHERE userID = ? ORDER BY transactionDate DESC LIMIT 10";
+  const formattedSql = mysql.format(sql, [userID]);
 
   conn.query(formattedSql, (err, result, fields) => {
     if (err) throw err;
