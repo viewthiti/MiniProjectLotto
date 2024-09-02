@@ -19,7 +19,12 @@ router.get("/total/:userID", (req, res) => {
     return res.status(400).json({ error: 'userID is required' });
   }
 
-  const sumWalletSql = "SELECT U.username, SUM(W.amount) AS total FROM Wallet WINNER JOIN Users U ON W.userID = U.userID WHERE W.userID = ?";
+  const sumWalletSql = `
+    SELECT U.username, SUM(W.amount) AS total 
+    FROM Wallet W
+    INNER JOIN Users U ON W.userID = U.userID 
+    WHERE W.userID = ?
+  `;
 
   conn.query(sumWalletSql, [userID], (err, result) => {
     if (err) {
@@ -28,10 +33,12 @@ router.get("/total/:userID", (req, res) => {
     }
 
     const total = result[0].total || 0;
+    const username = result[0].username || '';
 
-    return res.status(200).json({ total });
+    return res.status(200).json({ username, total });
   });
 });
+
 
 
 
