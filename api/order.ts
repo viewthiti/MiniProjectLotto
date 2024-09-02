@@ -24,35 +24,3 @@ function lottoRandom() {
   }
   return prizes;
 }
-
-router.post('/search', (req, res) => {
-    const { number } = req.body;
-    const numOptions = 10; 
-    const lengthOfOptions = 6; 
-
-    // ตรวจสอบว่าเลขที่ส่งมามี 6 หลักหรือไม่
-    if (!number || number.length > lengthOfOptions) {
-        return res.status(400).json({ error: 'หมายเลขต้องมี 6 หลักหรือไม่ควรเกิน 6 หลัก' });
-    }
-
-    if (number.length === lengthOfOptions) {
-        // ถ้าครบ 6 หลักให้แสดงเลขที่กรอก
-        return res.json({ options: [number] });
-    }
-
-    // สุ่มเลขที่เหลือ
-    const options = [];
-    const missingDigits = lengthOfOptions - number.length;
-
-    for (let i = 0; i < numOptions; i++) {
-        const randomDigits = Array.from({ length: missingDigits }, () => Math.floor(Math.random() * 10)).join('');
-        options.push(number + randomDigits);
-    }
-
-    res.json({ options });
-});
-
-
-
-
-
