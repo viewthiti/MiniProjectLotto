@@ -1,6 +1,7 @@
 import express from "express";
 import { conn } from "../dbconnect";
 import mysql from "mysql";
+import { log } from "console";
 
 export const router = express.Router();
 let winningNumbers: string[] = [];
