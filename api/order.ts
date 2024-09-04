@@ -8,10 +8,16 @@ let winningNumbers: string[] = [];
 
 
 //ดึงข้อมูลPurchasedLottoออกมาโชว์
-router.get("/PurchasedLotto", (req, res) => {
-  const sql = "SELECT lottoNumber FROM PurchasedLotto";
+router.get("/PurchasedLotto/:id", (req, res) => {
+  const userID = req.params.id;
+  const sql = `
+    SELECT lottoNumber 
+    FROM PurchasedLotto 
+    WHERE userID = ? 
+    AND purchaseDate = (SELECT MAX(purchaseDate) FROM PurchasedLotto WHERE userID = ?)
+  `;
   
-  conn.query(sql, (err, result) => {
+  conn.query(sql, [userID, userID], (err, result) => {
     if (err) {
       console.error(err);
       res.status(500).json({ message: "An error occurred while fetching data" });
@@ -21,6 +27,7 @@ router.get("/PurchasedLotto", (req, res) => {
     res.json(result);
   });
 });
+
 
 router.get("/random", (req, res) => {
   winningNumbers = lottoRandom(); // Generates random lottery numbers
