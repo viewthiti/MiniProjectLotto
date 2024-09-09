@@ -87,29 +87,19 @@ router.post("/lottoWin", (req, res) => {
 
 
 router.get("/randomALL3", (req, res) => {
-  const { userID } = req.query;
-
-  // ตรวจสอบว่า userID ถูกส่งมาหรือไม่
-  if (!userID) {
-    return res.status(400).json({ error: "userID is required" });
-  }
-
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
-  // สมมติว่ามีการจัดการหมายเลขที่ถูกซื้อเก็บไว้ใน purchasedNumbers ตาม userID
-  const userPurchasedNumbers = purchasedNumbers.get(userID) || new Set(); // ถ้าไม่มีข้อมูล userID นี้จะได้ Set ว่างๆ
 
   // กรองเลขล็อตเตอรี่ที่ถูกซื้อออก แต่ไม่แก้ไข cachedPrizes เอง
-  const availablePrizes = cachedPrizes.filter(num => !userPurchasedNumbers.has(num));
+  const availablePrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
 
   // ส่งทั้ง availablePrizes และ cachedPrizes กลับไปในอ็อบเจ็กต์เดียว
   res.status(200).json({ 
     winningNumbers: availablePrizes, // เลขที่ยังไม่ได้ซื้อ
-    winningNumbers2: cachedPrizes    // เลขทั้งหมดที่สุ่มไว้
+    winningNumbers2: cachedPrizes        // เลขทั้งหมดที่สุ่มไว้
   });
 });
-
 
 // ฟังก์ชันสุ่มเลขทั้งหมด
 function lottoWinAll(): string[] {
