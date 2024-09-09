@@ -19,6 +19,7 @@ router.get("/admin", (req, res) => {
 });
 
 //random
+// รับหมายเลขสุ่มจาก `getRandomPrizes` หรือ `lottoWinSold`
 router.get("/random", async (req, res) => {
   const type = req.query.type; // รับค่าจาก query parameter
 
@@ -42,6 +43,7 @@ router.get("/random", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 // insert เลขที่สุ่มแล้ว
@@ -71,7 +73,7 @@ router.post("/lottoWin", (req, res) => {
     }
 
     // ทำการสุ่มหมายเลขใหม่หลังจากการบันทึกสำเร็จ
-    cachedPrizes = [];
+    cachedPrizes = []; // รีเซ็ต cachedPrizes
 
     // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
     res.status(201).json({
@@ -82,10 +84,19 @@ router.post("/lottoWin", (req, res) => {
 });
 
 
-//สุ่มเลขทั้งหมด
-// ฟังก์ชันที่สุ่มหมายเลขทั้งหมด
-function lottoWinAll() {
-  const prizes = [];
+// ฟังก์ชันสุ่มเลขทั้งหมด (แก้ไข)
+router.get("/randomALL", (req, res) => {
+  if (cachedPrizes.length === 0) {
+    cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
+  }
+  res.status(200).json({ winningNumbers: cachedPrizes }); // ส่งหมายเลขทั้งหมด
+});
+
+
+
+// ฟังก์ชันสุ่มเลขทั้งหมด
+function lottoWinAll(): string[] {
+  const prizes: string[] = [];
   const numPrizes = 100; // จำนวนรางวัล
   const numDigits = 6; // จำนวนหลักของตัวเลข
 
@@ -100,7 +111,7 @@ function lottoWinAll() {
 }
 
 // ฟังก์ชันที่สุ่ม 5 หมายเลขจากหมายเลขทั้งหมดที่ได้จาก lottoWinAll
-function getRandomPrizes(numPrizesToSelect = 5) {
+function getRandomPrizes(numPrizesToSelect = 5): string[] {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่เมื่อยังไม่มีหมายเลขในตัวแปร
   }
