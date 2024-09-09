@@ -104,7 +104,7 @@ router.get("/randomALL3", (req, res) => {
 // ฟังก์ชันสุ่มเลขทั้งหมด
 function lottoWinAll(): string[] {
   const prizes: string[] = [];
-  const numPrizes = 100; // จำนวนรางวัล
+  const numPrizes = 110; // จำนวนรางวัล
   const numDigits = 6; // จำนวนหลักของตัวเลข
 
   for (let i = 0; i < numPrizes; i++) {
