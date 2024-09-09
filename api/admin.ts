@@ -90,17 +90,11 @@ router.get("/randomALL", (req, res) => {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
+  
+  cachedPrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
 
-  // กรองเลขล็อตเตอรี่ที่ถูกซื้อออก แต่ไม่แก้ไข cachedPrizes เอง
-  const availablePrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
-
-  // ส่งทั้ง availablePrizes และ cachedPrizes กลับไปในอ็อบเจ็กต์เดียว
-  res.status(200).json({ 
-    availablePrizes: availablePrizes, // เลขที่ยังไม่ได้ซื้อ
-    cachedPrizes: cachedPrizes        // เลขทั้งหมดที่สุ่มไว้
-  });
+  res.status(200).json({ winningNumbers:  cachedPrizes}); // ส่งหมายเลขทั้งหมด
 });
-
 
 // router.get("/random", (req, res) => {
 //   if (cachedPrizes.length === 0) {
