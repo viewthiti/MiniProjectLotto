@@ -2,7 +2,6 @@ import express from "express";
 import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { AdminDrawsGetResponse } from "../model/admin_get_res";
-import { log } from "console";
 // import { WalletGetResponse } from "../model/wallet_get_res";
 
 export const router = express.Router();
@@ -88,16 +87,27 @@ router.post("/lottoWin", (req, res) => {
 
 // ฟังก์ชันสุ่มเลขทั้งหมด (แก้ไข)
 router.get("/randomALL", (req, res) => {
-  // ตรวจสอบว่าเคยมีการสุ่ม cachedPrizes แล้วหรือไม่
-  if (!cachedPrizes || cachedPrizes.length === 0) {
+  if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
 
-  // กรองเลขล็อตเตอรี่ที่ถูกซื้อออก แต่ยังคงหมายเลขทั้งหมดใน cachedPrizes
+  // กรองเลขล็อตเตอรี่ที่ถูกซื้อออก แต่ไม่แก้ไข cachedPrizes เอง
   const availablePrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
-  
-  res.status(200).json({ winningNumbers: availablePrizes }); // ส่งหมายเลขทั้งหมดที่ไม่ถูกซื้อ
+
+  // ส่งทั้ง availablePrizes และ cachedPrizes กลับไปในอ็อบเจ็กต์เดียว
+  res.status(200).json({ 
+    availablePrizes: availablePrizes, // เลขที่ยังไม่ได้ซื้อ
+    cachedPrizes: cachedPrizes        // เลขทั้งหมดที่สุ่มไว้
+  });
 });
+
+
+// router.get("/random", (req, res) => {
+//   if (cachedPrizes.length === 0) {
+//     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
+//   }
+//   res.status(200).json({ winningNumbers:  cachedPrizes}); // ส่งหมายเลขทั้งหมด
+// });
 
 
 
