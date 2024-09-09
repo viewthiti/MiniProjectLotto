@@ -16,7 +16,10 @@ router.get("/admin", (req, res) => {
   );
 });
 
-//random
+// Variable to cache the last drawn date
+let lastDrawnDate: string | null = null;
+
+// API สำหรับสุ่มหมายเลข
 router.get("/random", async (req, res) => {
   const type = req.query.type; // รับค่าจาก query parameter
 
@@ -25,7 +28,16 @@ router.get("/random", async (req, res) => {
 
     // ตรวจสอบค่าที่รับมา
     if (type === "1") {
-      winningNumbers = lottoWinAll(); // คาดว่า lottoWinAll เป็น synchronous
+      const currentDate = new Date().toISOString().slice(0, 10);
+
+      if (lastDrawnDate !== currentDate) {
+        // ถ้าไม่ใช่วันที่สุ่มล่าสุด ให้สุ่มเลขใหม่
+        winningNumbers = lottoWinAll();
+        lastDrawnDate = currentDate; // Update the last drawn date
+      } else {
+        // ส่งหมายเลขที่สุ่มก่อนหน้านี้
+        winningNumbers = []; // Or fetch the previously stored numbers
+      }
     } else if (type === "2") {
       winningNumbers = await lottoWinSold(); // ใช้ await เพื่อรอผลลัพธ์
     } else {
@@ -41,7 +53,9 @@ router.get("/random", async (req, res) => {
   }
 });
 
+
 //insert เลขที่สุ่มเเล้ว
+// API สำหรับบันทึกหมายเลขที่สุ่มแล้ว
 router.post("/lottoWin", (req, res) => {
   const { winningNumbers } = req.body; // รับค่าจาก body
   const drawDate = new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -67,6 +81,9 @@ router.post("/lottoWin", (req, res) => {
       return res.status(500).json({ error: "Database error" });
     }
 
+    // อัปเดตวันออกรางวัลล่าสุด
+    lastDrawnDate = new Date().toISOString().slice(0, 10);
+
     // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
     res.status(201).json({
       affected_rows_AdminDraws: result.affectedRows,
@@ -74,6 +91,7 @@ router.post("/lottoWin", (req, res) => {
     });
   });
 });
+
 
 //สุ่มเลขทั้งหมด
 function lottoWinAll() {
