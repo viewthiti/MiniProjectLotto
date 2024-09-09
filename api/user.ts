@@ -49,7 +49,6 @@ router.post("/login", (req, res) => {
 });
 
 
-//insert amount ยังไม่ได้
 router.post("/register", (req, res) => {
   // Rece data and convert to model
   const users: Users = req.body;
@@ -80,10 +79,6 @@ router.post("/register", (req, res) => {
       return res.status(409).json({ errors });
     }
 
-    if (wallet.amount < 500) {
-      return res.status(403).json({ error: "Wallet amount must be greater than 500." });
-    }
-
     // ถ้าอีเมลไม่อยู่ในฐานข้อมูล ให้ทำการลงทะเบียนผู้ใช้ใหม่
     try {
       const hashedPassword = await bcrypt.hash(users.password, 10);
@@ -110,7 +105,7 @@ router.post("/register", (req, res) => {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-        sql1 = mysql.format(sql1, [userID, wallet.amount, transactionDate]);
+        sql1 = mysql.format(sql1, [userID, 500, transactionDate]);
 
         // ส่งข้อมูลกระเป๋าเงินไปยังฐานข้อมูล
         conn.query(sql1, (err1, result1) => {
