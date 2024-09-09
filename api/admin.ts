@@ -2,6 +2,7 @@ import express from "express";
 import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { AdminDrawsGetResponse } from "../model/admin_get_res";
+import { log } from "console";
 // import { WalletGetResponse } from "../model/wallet_get_res";
 
 export const router = express.Router();
@@ -126,6 +127,7 @@ function getRandomPrizes(numPrizesToSelect = 5): string[] {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่เมื่อยังไม่มีหมายเลขในตัวแปร
   }
+  console.log(cachedPrizes);
   const shuffledPrizes = cachedPrizes.sort(() => 0.5 - Math.random()); // สุ่มเรียงลำดับหมายเลขทั้งหมด
   return shuffledPrizes.slice(0, numPrizesToSelect); // เลือกหมายเลขที่สุ่มมา 5 ตัว
 }
