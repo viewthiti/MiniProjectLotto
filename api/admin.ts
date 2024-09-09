@@ -86,24 +86,6 @@ router.post("/lottoWin", (req, res) => {
 });
 
 
-// ฟังก์ชันสุ่มเลขทั้งหมด (แก้ไข)
-router.get("/randomALL", (req, res) => {
-  if (cachedPrizes.length === 0) {
-    cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
-  }
-  
-  const availablePrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
-
-  res.status(200).json({ winningNumbers:  availablePrizes}); // ส่งหมายเลขทั้งหมด
-});
-
-router.get("/randomALL2", (req, res) => {
-  if (cachedPrizes.length === 0) {
-    cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
-  }
-  res.status(200).json({ winningNumbers:  cachedPrizes}); // ส่งหมายเลขทั้งหมด
-});
-
 router.get("/randomALL3", (req, res) => {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
@@ -118,16 +100,6 @@ router.get("/randomALL3", (req, res) => {
     winningNumbers2: cachedPrizes        // เลขทั้งหมดที่สุ่มไว้
   });
 });
-
-
-// router.get("/random", (req, res) => {
-//   if (cachedPrizes.length === 0) {
-//     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
-//   }
-//   res.status(200).json({ winningNumbers:  cachedPrizes}); // ส่งหมายเลขทั้งหมด
-// });
-
-
 
 // ฟังก์ชันสุ่มเลขทั้งหมด
 function lottoWinAll(): string[] {
