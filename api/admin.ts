@@ -91,9 +91,6 @@ router.get("/randomALL", (req, res) => {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
-  
-  cachedPrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
-
   res.status(200).json({ winningNumbers:  cachedPrizes}); // ส่งหมายเลขทั้งหมด
 });
 
@@ -101,6 +98,7 @@ router.get("/randomALL", (req, res) => {
 //   if (cachedPrizes.length === 0) {
 //     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
 //   }
+//   cachedPrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
 //   res.status(200).json({ winningNumbers:  cachedPrizes}); // ส่งหมายเลขทั้งหมด
 // });
 
