@@ -6,6 +6,8 @@ import { AdminDrawsGetResponse } from "../model/admin_get_res";
 
 export const router = express.Router();
 let winningNumbers: string[] = [];
+let cachedPrizes : string[] = []; // ตัวแปร global สำหรับเก็บหมายเลขที่สุ่มแล้ว
+
 
 router.get("/admin", (req, res) => {
   conn.query(
@@ -16,10 +18,7 @@ router.get("/admin", (req, res) => {
   );
 });
 
-// Variable to cache the last drawn date
-let lastDrawnDate: string | null = null;
-
-// API สำหรับสุ่มหมายเลข
+//random
 router.get("/random", async (req, res) => {
   const type = req.query.type; // รับค่าจาก query parameter
 
@@ -28,16 +27,7 @@ router.get("/random", async (req, res) => {
 
     // ตรวจสอบค่าที่รับมา
     if (type === "1") {
-      const currentDate = new Date().toISOString().slice(0, 10);
-
-      if (lastDrawnDate !== currentDate) {
-        // ถ้าไม่ใช่วันที่สุ่มล่าสุด ให้สุ่มเลขใหม่
-        winningNumbers = lottoWinAll();
-        lastDrawnDate = currentDate; // Update the last drawn date
-      } else {
-        // ส่งหมายเลขที่สุ่มก่อนหน้านี้
-        winningNumbers = []; // Or fetch the previously stored numbers
-      }
+      winningNumbers = getRandomPrizes(); // คาดว่า lottoWinAll เป็น synchronous
     } else if (type === "2") {
       winningNumbers = await lottoWinSold(); // ใช้ await เพื่อรอผลลัพธ์
     } else {
@@ -54,8 +44,7 @@ router.get("/random", async (req, res) => {
 });
 
 
-//insert เลขที่สุ่มเเล้ว
-// API สำหรับบันทึกหมายเลขที่สุ่มแล้ว
+// insert เลขที่สุ่มแล้ว
 router.post("/lottoWin", (req, res) => {
   const { winningNumbers } = req.body; // รับค่าจาก body
   const drawDate = new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -81,8 +70,8 @@ router.post("/lottoWin", (req, res) => {
       return res.status(500).json({ error: "Database error" });
     }
 
-    // อัปเดตวันออกรางวัลล่าสุด
-    lastDrawnDate = new Date().toISOString().slice(0, 10);
+    // ทำการสุ่มหมายเลขใหม่หลังจากการบันทึกสำเร็จ
+    cachedPrizes = [];
 
     // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
     res.status(201).json({
@@ -94,6 +83,7 @@ router.post("/lottoWin", (req, res) => {
 
 
 //สุ่มเลขทั้งหมด
+// ฟังก์ชันที่สุ่มหมายเลขทั้งหมด
 function lottoWinAll() {
   const prizes = [];
   const numPrizes = 100; // จำนวนรางวัล
@@ -108,6 +98,20 @@ function lottoWinAll() {
   }
   return prizes;
 }
+
+// ฟังก์ชันที่สุ่ม 5 หมายเลขจากหมายเลขทั้งหมดที่ได้จาก lottoWinAll
+function getRandomPrizes(numPrizesToSelect = 5) {
+  if (cachedPrizes.length === 0) {
+    cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่เมื่อยังไม่มีหมายเลขในตัวแปร
+  }
+  const shuffledPrizes = cachedPrizes.sort(() => 0.5 - Math.random()); // สุ่มเรียงลำดับหมายเลขทั้งหมด
+  return shuffledPrizes.slice(0, numPrizesToSelect); // เลือกหมายเลขที่สุ่มมา 5 ตัว
+}
+
+
+// การทดสอบการเรียกใช้งาน
+console.log(getRandomPrizes()); // จะได้ 5 หมายเลขที่สุ่มมาจากหมายเลขทั้งหมด
+
 //สุ่มเลขที่ขายแล้ว
 function lottoWinSold(): Promise<string[]> {
   return new Promise((resolve, reject) => {
