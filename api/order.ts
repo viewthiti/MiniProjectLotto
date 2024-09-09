@@ -36,7 +36,7 @@ router.get("/random", (req, res) => {
 
 function lottoRandom() {
   const prizes = [];
-  const numPrizes = 10; // จำนวนรางวัล
+  const numPrizes = 100; // จำนวนรางวัล
   const numDigits = 6; // จำนวนหลักของตัวเลข
 
   for (let i = 0; i < numPrizes; i++) {
