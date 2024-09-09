@@ -78,7 +78,7 @@ router.post("/lottoWin", (req, res) => {
 //สุ่มเลขทั้งหมด
 function lottoWinAll() {
   const prizes = [];
-  const numPrizes = 5; // จำนวนรางวัล
+  const numPrizes = 100; // จำนวนรางวัล
   const numDigits = 6; // จำนวนหลักของตัวเลข
 
   for (let i = 0; i < numPrizes; i++) {

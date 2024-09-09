@@ -3,6 +3,7 @@ import { conn } from "../dbconnect";
 import { Users } from "../model/users_get_res";
 import mysql from "mysql";
 import { WalletGetResponse } from "../model/wallet_get_res";
+import { changepassword } from "../model/changepassword";
 
 export const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -148,5 +149,69 @@ router.delete("/delete/:id", (req, res) => {
         message: "User deleted successfully",
       });
     } 
+  });
+});
+
+//ดึงข้อมูลออกมา
+// router.get("/:userID", (req, res) => {
+//   const userID = +req.params.userID;
+//   const sql = "select userID,password  from Users where userID = ?";
+//   // log(userID);
+//   conn.query(sql, [userID], (err, result) => {
+//     if (err) {
+//       console.error(err);
+//       res.status(500).json({ error: 'Internal server error' });
+//       return;
+//     }
+//     res.json(result[0]);
+//   });
+ 
+// });
+//เปลี่ยนรหัสผ่าน
+router.put("/resetpassword/:id", (req, res) => {
+  const userId = req.params.id;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ error: "รหัสผ่านใหม่ไม่ตรงกัน." });
+  }
+
+  // ดึงข้อมูลรหัสผ่านปัจจุบันของผู้ใช้จากฐานข้อมูล
+  const fetchUserSql = "SELECT `password` FROM `Users` WHERE `userId` = ?";
+  conn.query(mysql.format(fetchUserSql, [userId]), async (err, results) => {
+    if (err) {
+      console.error("เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้:", err);
+      return res.status(500).json({ error: "ข้อผิดพลาดฐานข้อมูล." });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "ไม่พบผู้ใช้." });
+    }
+
+    const storedPasswordHash = results[0].password;
+
+    // เปรียบเทียบรหัสผ่านปัจจุบันกับรหัสผ่านที่เก็บในฐานข้อมูล
+    const isPasswordMatch = await bcrypt.compare(currentPassword, storedPasswordHash);
+    if (!isPasswordMatch) {
+      return res.status(400).json({ error: "รหัสผ่านปัจจุบันไม่ถูกต้อง." });
+    }
+
+    // ถ้ารหัสผ่านตรงกัน ให้ทำการแฮชรหัสผ่านใหม่
+    try {
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      const updatePasswordSql = "UPDATE `Users` SET `password` = ? WHERE `userId` = ?";
+
+      conn.query(mysql.format(updatePasswordSql, [hashedNewPassword, userId]), (err, result) => {
+        if (err) {
+          console.error("เกิดข้อผิดพลาดในการอัปเดตรหัสผ่าน:", err);
+          return res.status(500).json({ error: "ข้อผิดพลาดฐานข้อมูลระหว่างการอัปเดตรหัสผ่าน." });
+        }
+
+        res.status(200).json({ message: "เปลี่ยนรหัสผ่านสำเร็จ." });
+      });
+    } catch (hashError) {
+      console.error("เกิดข้อผิดพลาดในการแฮชรหัสผ่านใหม่:", hashError);
+      return res.status(500).json({ error: "เกิดข้อผิดพลาดในการอัปเดตรหัสผ่าน." });
+    }
   });
 });
