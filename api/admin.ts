@@ -7,6 +7,7 @@ import { AdminDrawsGetResponse } from "../model/admin_get_res";
 export const router = express.Router();
 let winningNumbers: string[] = [];
 let cachedPrizes : string[] = []; // ตัวแปร global สำหรับเก็บหมายเลขที่สุ่มแล้ว
+const { purchasedNumbers } = require('./purchasedNumbers');
 
 
 router.get("/admin", (req, res) => {
@@ -86,13 +87,15 @@ router.post("/lottoWin", (req, res) => {
 
 // ฟังก์ชันสุ่มเลขทั้งหมด (แก้ไข)
 router.get("/randomALL", (req, res) => {
-  if (cachedPrizes.length === 0) {
+  if (cachedPrizes.length === 0 ) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
 
-  res.status(200).json({ winningNumbers:  cachedPrizes}); // ส่งหมายเลขทั้งหมด
+  // กรองเลขล็อตเตอรี่ที่ถูกซื้อออก แต่ยังคงไว้ใน cachedPrizes
+  cachedPrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
+  
+  res.status(200).json({ winningNumbers: cachedPrizes }); // ส่งหมายเลขทั้งหมดที่ไม่ถูกซื้อ
 });
-
 
 
 // ฟังก์ชันสุ่มเลขทั้งหมด

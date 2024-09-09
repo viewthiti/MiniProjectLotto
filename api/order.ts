@@ -5,6 +5,7 @@ import { log } from "console";
 
 export const router = express.Router();
 let winningNumbers: string[] = [];
+const { purchasedNumbers } = require('./purchasedNumbers');
 
 
 //ดึงข้อมูลPurchasedLottoออกมาโชว์
@@ -90,6 +91,7 @@ router.post("/lottoBuy/:userID", (req, res) => {
              return res.status(500).json({ error: "Database error" });
            }
 
+           purchasedNumbers.add(lottoNumber); console.log(purchasedNumbers);
           // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
           res.status(201).json({
             affected_rows_PurchasedLotto: result.affectedRows,
