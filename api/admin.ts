@@ -114,8 +114,8 @@ router.get("/randomALL3", (req, res) => {
 
   // ส่งทั้ง availablePrizes และ cachedPrizes กลับไปในอ็อบเจ็กต์เดียว
   res.status(200).json({ 
-    availablePrizes: availablePrizes, // เลขที่ยังไม่ได้ซื้อ
-    cachedPrizes: cachedPrizes        // เลขทั้งหมดที่สุ่มไว้
+    winningNumbers: availablePrizes, // เลขที่ยังไม่ได้ซื้อ
+    winningNumbers2: cachedPrizes        // เลขทั้งหมดที่สุ่มไว้
   });
 });
 
