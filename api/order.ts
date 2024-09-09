@@ -3,6 +3,8 @@ import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { log } from "console";
 
+const { purchasedNumbers } = require('./purchasedNumbers');
+
 export const router = express.Router();
 let winningNumbers: string[] = [];
 
@@ -28,26 +30,6 @@ router.get("/PurchasedLotto/:id", (req, res) => {
   });
 });
 
-
-router.get("/random", (req, res) => {
-  winningNumbers = lottoRandom(); // Generates random lottery numbers
-  res.status(200).json({ winningNumbers }); // Sends the numbers back to the client
-});
-
-function lottoRandom() {
-  const prizes = [];
-  const numPrizes = 100; // จำนวนรางวัล
-  const numDigits = 6; // จำนวนหลักของตัวเลข
-
-  for (let i = 0; i < numPrizes; i++) {
-    let number = "";
-    for (let j = 0; j < numDigits; j++) {
-      number += Math.floor(Math.random() * 10); // สุ่มตัวเลข 0-9
-    }
-    prizes.push(number);
-  }
-  return prizes;
-}
 
 //insert เลขที่ซื้อในตะกร้าโดยที่หักเงินเเล้ว 
 router.post("/lottoBuy/:userID", (req, res) => {
@@ -111,6 +93,7 @@ router.post("/lottoBuy/:userID", (req, res) => {
              return res.status(500).json({ error: "Database error" });
            }
 
+           purchasedNumbers.add(lottoNumber); 
           // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
           res.status(201).json({
             affected_rows_PurchasedLotto: result.affectedRows,

@@ -5,6 +5,8 @@ import { AdminDrawsGetResponse } from "../model/admin_get_res";
 // import { WalletGetResponse } from "../model/wallet_get_res";
 
 export const router = express.Router();
+const { purchasedNumbers } = require('./purchasedNumbers');
+
 let winningNumbers: string[] = [];
 let cachedPrizes : string[] = []; // ตัวแปร global สำหรับเก็บหมายเลขที่สุ่มแล้ว
 
@@ -89,7 +91,9 @@ router.get("/randomALL", (req, res) => {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
-  res.status(200).json({ winningNumbers: cachedPrizes }); // ส่งหมายเลขทั้งหมด
+  const availablePrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
+
+  res.status(200).json({ winningNumbers: availablePrizes }); // ส่งหมายเลขทั้งหมด
 });
 
 
@@ -193,5 +197,7 @@ router.get("/drawsNow", (req, res) => {
     }
   );
 });
+
+
 
 
