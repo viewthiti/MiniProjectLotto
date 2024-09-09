@@ -97,7 +97,6 @@ router.get("/randomALL3", (req, res) => {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
-
   // สมมติว่ามีการจัดการหมายเลขที่ถูกซื้อเก็บไว้ใน purchasedNumbers ตาม userID
   const userPurchasedNumbers = purchasedNumbers.get(userID) || new Set(); // ถ้าไม่มีข้อมูล userID นี้จะได้ Set ว่างๆ
 
