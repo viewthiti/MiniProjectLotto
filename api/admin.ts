@@ -120,6 +120,7 @@ function getRandomPrizes(numPrizesToSelect = 5): string[] {
 }
 
 
+
 // การทดสอบการเรียกใช้งาน
 console.log(getRandomPrizes()); // จะได้ 5 หมายเลขที่สุ่มมาจากหมายเลขทั้งหมด
 
