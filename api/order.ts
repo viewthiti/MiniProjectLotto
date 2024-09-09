@@ -3,8 +3,6 @@ import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { log } from "console";
 
-const { purchasedNumbers } = require('./purchasedNumbers');
-
 export const router = express.Router();
 let winningNumbers: string[] = [];
 
@@ -29,7 +27,6 @@ router.get("/PurchasedLotto/:id", (req, res) => {
     res.json(result);
   });
 });
-
 
 //insert เลขที่ซื้อในตะกร้าโดยที่หักเงินเเล้ว 
 router.post("/lottoBuy/:userID", (req, res) => {
@@ -93,7 +90,6 @@ router.post("/lottoBuy/:userID", (req, res) => {
              return res.status(500).json({ error: "Database error" });
            }
 
-           purchasedNumbers.add(lottoNumber); 
           // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
           res.status(201).json({
             affected_rows_PurchasedLotto: result.affectedRows,
