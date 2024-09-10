@@ -12,7 +12,7 @@ router.delete("/delete", (req, res) => {
   });
 
   const deleteAdminDraws = new Promise((resolve, reject) => {
-    conn.query("DELETE FROM adminDraws", (err, result) => {
+    conn.query("DELETE FROM AdminDraws", (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
