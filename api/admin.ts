@@ -209,13 +209,13 @@ router.get("/drawsNow", (req, res) => {
 
       // ถ้าไม่มีข้อมูลใน table ให้ส่งค่ากลับตามโครงสร้างของ AdminDrawsGetResponse
       if (result.length === 0) {
-        let defaultResponse = Array.from({ length: 5 }, (_, index) => ({
+          result = Array.from({ length: 5 }, (_, index) => ({
           winningNumber: "xxxxxx", // ค่า placeholder ที่ต้องการ
           prizeType: index + 1, // รันเลข 1-5
           drawDate: new Date(), // วันที่ปัจจุบัน (หรือจะกำหนดเป็น null หรือค่าอื่นได้)
         }));
 
-        return res.json(defaultResponse);
+        return res.json(result);
       }
 
       // ถ้ามีข้อมูล, กำหนด type ให้กับ result ว่าเป็น array ของ objects
