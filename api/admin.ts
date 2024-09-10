@@ -213,7 +213,7 @@ router.get("/drawsNow", (req, res) => {
           drawID: index + 1,
           winningNumber: "xxxxxx", // Placeholder value
           prizeType: index + 1, // Run numbers 1-5
-          drawDate: new Date(), // Current date (can change to null or other value)
+          drawDate: "รอการออกรางวัล", // Current date (can change to null or other value)
         }));
 
         return res.json(defaultResponse);
