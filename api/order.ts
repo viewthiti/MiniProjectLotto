@@ -105,33 +105,6 @@ router.post("/lottoBuy/:userID", (req, res) => {
   });
 });
 
-//ขึ้นเงิน
-router.post("/add/:userID", (req, res) =>  {
-  const userID = +req.params.userID;
-  const { amount } = req.body;
-
-  // Validate input
-  if (!userID || !amount) {
-    return res.status(400).json({ error: 'userID and amount are required' });
-  }
-
-  if (amount < 500) {
-    return res.status(403).json({ error: 'Wallet amount must be greater than 500.' });
-  }
-
-  const purchaseDate = new Date();  // Get the current date
-  const insertWalletSql = "INSERT INTO Wallet (userID, amount, transactionDate) VALUES (?, ?, ?)";
-
-  conn.query(insertWalletSql, [userID, amount, purchaseDate], (err, result) => {
-    if (err) {
-      console.error("Error inserting into Wallet:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-
-    return res.status(200).json({ message: "Amount added successfully", result });
-  });
-});
-
 router.get("/purchasedLotto", (req, res) => {
   const userID = req.query.userID; // รับ userID จาก query string
 
@@ -153,32 +126,9 @@ router.get("/purchasedLotto", (req, res) => {
   });
 });
 
-router.get("/checkLottoNumbers/:userID", (req, res) => {
-  const userID = req.params.userID;
-
-  // SQL query to join tables and find matching lotto numbers
-  const sql = `
-    SELECT p.*, d.*, d.*
-    FROM PurchasedLotto p
-    JOIN AdminDraws d ON p.lottoNumber = d.lottoNumber
-    WHERE p.userID = ?
-    ORDER BY d.drawDate DESC
-  `;
-
-  conn.query(sql, [userID], (err, results) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ message: "An error occurred while fetching data" });
-      return;
-    }
-
-    // Return results
-    res.json(results);
-  });
-});
 
 router.get("/PurchasedLotto/:id", (req, res) => {
-  const userID = req.params.id; // Use req.params.id for route parameters
+  const userID = req.params.id; 
 
   const sql = `
     SELECT DATE(purchaseDate) AS purchaseDate, GROUP_CONCAT(lottoNumber) AS purchasedNumbers
@@ -194,10 +144,11 @@ router.get("/PurchasedLotto/:id", (req, res) => {
       return res.status(500).json({ error: "Database error" });
     }
 
-    res.status(200).json(result); // Send results back to client
+    res.status(200).json(result); 
   });
 });
 
+//เช็คผลรางวัล
 router.get("/check/:id", (req, res) => {
   const userID = req.params.id;
   const sql = `
@@ -218,8 +169,8 @@ router.get("/check/:id", (req, res) => {
   });
 });
 
+//เช็คผลรางวัล
 router.get("/check2", (req, res) => {
-  // Correct SQL query
   const sql = `
     SELECT *
     FROM AdminDraws
@@ -236,4 +187,35 @@ router.get("/check2", (req, res) => {
     res.json(result);
   });
 });
+
+//ขึ้นเงิน
+router.post("/prizeMoney/:userID/:purchaseID", (req, res) => {
+  const userID = +req.params.userID;
+  const purchaseID = +req.params.purchaseID;
+
+  const prizeMoney = req.body.prizeMoney;  
+  const purchaseDate = new Date(); 
+  
+  const insertWalletSql = "INSERT INTO Wallet (userID, amount, transactionDate) VALUES (?, ?, ?)";
+  const deletePurchaseSql = "DELETE FROM PurchasedLotto WHERE purchaseID = ?";
+
+  conn.query(insertWalletSql, [userID, prizeMoney, purchaseDate], (err, result) => {
+    if (err) {
+      console.error("Error inserting into Wallet:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    conn.query(deletePurchaseSql, [purchaseID], (err, results) => {
+      if (err) {
+        console.error("Error deleting from tablePurchasedLotto:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+
+      return res.status(200).json({ message: "Amount added and purchase record deleted successfully", result });
+    });
+  });
+});
+
+
+
 
