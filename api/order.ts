@@ -123,7 +123,23 @@ router.get("/PurchasedLotto/:id", (req, res) => {
       return res.status(500).json({ error: "Database error" });
     }
 
-    res.status(200).json(result); 
+    // พิมพ์ข้อมูลดิบเพื่อตรวจสอบโครงสร้าง
+    // console.log("Raw result:", result);
+
+    if (result.length > 0) {
+      // ปรับปีจาก ค.ศ. เป็น พ.ศ. และจัดรูปแบบวันที่
+      result = result.map((transaction: { purchaseDate: string}) => {
+        let purchaseDate = moment(transaction.purchaseDate); // ใช้ purchaseDate
+        let yearBuddhistEra = purchaseDate.year() + 543; // ปรับปีเป็น พ.ศ.
+        transaction.purchaseDate = purchaseDate.format(`DD MMMM ${yearBuddhistEra}`); // จัดรูปแบบวันที่ตามที่ต้องการ
+        return transaction;
+      });
+    } else {
+      console.log("No results found");
+    }
+
+    // ส่งผลลัพธ์ที่จัดรูปแบบแล้วกลับไปที่ client
+    res.status(200).json(result);
   });
 });
 
