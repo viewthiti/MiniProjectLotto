@@ -107,7 +107,6 @@ router.post("/lottoBuy/:userID", (req, res) => {
 
 
 // ***************************************
-
 router.get("/PurchasedLotto/:id", (req, res) => {
   const userID = req.params.id; 
 
