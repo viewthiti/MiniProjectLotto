@@ -207,23 +207,22 @@ router.get("/drawsNow", (req, res) => {
     (err, result, fields) => {
       if (err) throw err;
 
-      // ถ้าไม่มีข้อมูลใน table ให้ส่งค่ากลับตามโครงสร้างของ AdminDrawsGetResponse
+      // If there's no data, return the placeholder structure
       if (result.length === 0) {
-          result = Array.from({ length: 5 }, (_, index) => ({
-          winningNumber: "xxxxxx", // ค่า placeholder ที่ต้องการ
-          prizeType: index + 1, // รันเลข 1-5
-          drawDate: new Date(), // วันที่ปัจจุบัน (หรือจะกำหนดเป็น null หรือค่าอื่นได้)
+        let defaultResponse = Array.from({ length: 5 }, (_, index) => ({
+          winningNumber: "xxxxxx", // Placeholder value
+          prizeType: index + 1, // Run numbers 1-5
+          drawDate: new Date(), // Current date (can change to null or other value)
         }));
 
-        return res.json(result);
+        return res.json(defaultResponse);
       }
 
-      // ถ้ามีข้อมูล, กำหนด type ให้กับ result ว่าเป็น array ของ objects
+      // If there is data, process and convert the drawDate to Buddhist Era
       result = result.map((draw: { drawDate: any }) => {
-        // ปรับปีจาก ค.ศ. เป็น พ.ศ.
         let drawDate = moment(draw.drawDate);
-        let yearBuddhistEra = drawDate.year() + 543;
-        draw.drawDate = drawDate.format(`DD MMMM ${yearBuddhistEra}`);
+        let yearBuddhistEra = drawDate.year() + 543; // Convert to Buddhist Era
+        draw.drawDate = drawDate.format(`DD MMMM ${yearBuddhistEra}`); // Format date as required
         return draw;
       });
 
@@ -231,3 +230,4 @@ router.get("/drawsNow", (req, res) => {
     }
   );
 });
+
