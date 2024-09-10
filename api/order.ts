@@ -2,7 +2,7 @@ import express from "express";
 import { conn } from "../dbconnect";
 import mysql from "mysql";
 import { log } from "console";
-const moment = require('moment');
+import moment from "moment";
 
 export const router = express.Router();
 let winningNumbers: string[] = [];
@@ -18,7 +18,7 @@ router.get("/Purchased/:id", (req, res) => {
     WHERE userID = ?
     ORDER BY purchaseDate DESC
   `;
-  
+
   conn.query(sql, [userID, userID], (err, result) => {
     if (err) {
       console.error(err);
@@ -33,15 +33,15 @@ router.get("/Purchased/:id", (req, res) => {
 //insert เลขที่ซื้อในตะกร้าโดยที่หักเงินเเล้ว 
 router.post("/lottoBuy/:userID", (req, res) => {
   const userID = +req.params.userID;
-  const { lottoNumber } = req.body; 
+  const { lottoNumber } = req.body;
   const purchaseDate = new Date().toISOString().slice(0, 19).replace("T", " ");
-  const cost = 120; 
+  const cost = 120;
 
   // ตรวจสอบว่า `lottoNumber` เป็น string และไม่ใช่ค่าที่ว่างเปล่า
   if (typeof lottoNumber !== "string" || lottoNumber.trim() === "") {
     return res.status(400).json({ error: "Invalid lotto number format" });
   }
-  
+
   // ตรวจสอบยอดเงินใน Wallet
   const checkWalletSql = "SELECT SUM(amount) AS totalAmount FROM Wallet WHERE userID = ?";
   conn.query(checkWalletSql, [userID], (err, result) => {
@@ -84,15 +84,15 @@ router.post("/lottoBuy/:userID", (req, res) => {
           return res.status(500).json({ error: "Database error" });
         }
 
-         // แทรกข้อมูลการถอนเงินลงใน Wallet
-         const insertWalletSql = "INSERT INTO Wallet (userID, amount, transactionDate) VALUES (?, ?, ?)";
-         conn.query(insertWalletSql, [userID, -cost, purchaseDate], (err, result) => {
-           if (err) {
-             console.error("Error inserting into Wallet:", err);
-             return res.status(500).json({ error: "Database error" });
-           }
+        // แทรกข้อมูลการถอนเงินลงใน Wallet
+        const insertWalletSql = "INSERT INTO Wallet (userID, amount, transactionDate) VALUES (?, ?, ?)";
+        conn.query(insertWalletSql, [userID, -cost, purchaseDate], (err, result) => {
+          if (err) {
+            console.error("Error inserting into Wallet:", err);
+            return res.status(500).json({ error: "Database error" });
+          }
 
-           purchasedNumbers.add(lottoNumber); console.log(purchasedNumbers);
+          purchasedNumbers.add(lottoNumber); console.log(purchasedNumbers);
           // ส่งข้อมูลผลลัพธ์หลังจากการแทรก
           res.status(201).json({
             affected_rows_PurchasedLotto: result.affectedRows,
@@ -106,7 +106,7 @@ router.post("/lottoBuy/:userID", (req, res) => {
 });
 
 //ขึ้นเงิน
-router.post("/add/:userID", (req, res) =>  {
+router.post("/add/:userID", (req, res) => {
   const userID = +req.params.userID;
   const { amount } = req.body;
 
@@ -177,15 +177,17 @@ router.get("/checkLottoNumbers/:userID", (req, res) => {
   });
 });
 
+// ***************************************
+
 router.get("/PurchasedLotto/:id", (req, res) => {
-  const userID = req.params.id; // Use req.params.id for route parameters
+  const userID = req.params.id; 
 
   const sql = `
     SELECT DATE(purchaseDate) AS purchaseDate, GROUP_CONCAT(lottoNumber) AS purchasedNumbers
     FROM PurchasedLotto
     WHERE userID = ?
     GROUP BY DATE(purchaseDate)
-    ORDER BY purchaseDate
+    ORDER BY purchaseDate DESC
   `;
 
   conn.query(sql, [userID], (err, result) => {
@@ -194,9 +196,27 @@ router.get("/PurchasedLotto/:id", (req, res) => {
       return res.status(500).json({ error: "Database error" });
     }
 
-    res.status(200).json(result); // Send results back to client
+    // พิมพ์ข้อมูลดิบเพื่อตรวจสอบโครงสร้าง
+    // console.log("Raw result:", result);
+
+    if (result.length > 0) {
+      // ปรับปีจาก ค.ศ. เป็น พ.ศ. และจัดรูปแบบวันที่
+      result = result.map((transaction: { purchaseDate: string}) => {
+        let purchaseDate = moment(transaction.purchaseDate); // ใช้ purchaseDate
+        let yearBuddhistEra = purchaseDate.year() + 543; // ปรับปีเป็น พ.ศ.
+        transaction.purchaseDate = purchaseDate.format(`DD MMMM ${yearBuddhistEra}`); // จัดรูปแบบวันที่ตามที่ต้องการ
+        return transaction;
+      });
+    } else {
+      console.log("No results found");
+    }
+
+    // ส่งผลลัพธ์ที่จัดรูปแบบแล้วกลับไปที่ client
+    res.status(200).json(result);
   });
 });
+
+
 
 router.get("/check/:id", (req, res) => {
   const userID = req.params.id;
@@ -206,7 +226,7 @@ router.get("/check/:id", (req, res) => {
     WHERE userID = ? 
     AND purchaseDate = (SELECT MAX(purchaseDate) FROM PurchasedLotto WHERE userID = ?)
   `;
-  
+
   conn.query(sql, [userID, userID], (err, result) => {
     if (err) {
       console.error(err);
@@ -226,7 +246,7 @@ router.get("/check2", (req, res) => {
     ORDER BY drawID DESC
     LIMIT 5
   `;
-  
+
   conn.query(sql, (err, result) => {
     if (err) {
       console.error(err);
