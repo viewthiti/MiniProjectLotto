@@ -183,10 +183,9 @@ router.get("/PurchasedLotto/:id", (req, res) => {
   const userID = req.params.id; 
 
   const sql = `
-    SELECT DATE(purchaseDate) AS purchaseDate, GROUP_CONCAT(lottoNumber) AS purchasedNumbers
+    SELECT *
     FROM PurchasedLotto
     WHERE userID = ?
-    GROUP BY DATE(purchaseDate)
     ORDER BY purchaseDate DESC
   `;
 
