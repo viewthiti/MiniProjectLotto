@@ -3,7 +3,7 @@ import { conn } from "../dbconnect";
 
 export const router = express.Router();
 
-router.delete("/reset", (req, res) => {
+router.delete("/delete", (req, res) => {
   const deleteUsers = new Promise((resolve, reject) => {
     conn.query("DELETE FROM Users WHERE typeID = 1", (err, result) => {
       if (err) return reject(err);
