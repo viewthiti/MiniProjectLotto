@@ -210,6 +210,7 @@ router.get("/drawsNow", (req, res) => {
       // If there's no data, return the placeholder structure
       if (result.length === 0) {
         let defaultResponse = Array.from({ length: 5 }, (_, index) => ({
+          drawID: index + 1,
           winningNumber: "xxxxxx", // Placeholder value
           prizeType: index + 1, // Run numbers 1-5
           drawDate: new Date(), // Current date (can change to null or other value)
