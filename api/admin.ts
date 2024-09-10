@@ -7,9 +7,8 @@ import { log } from "console";
 
 export const router = express.Router();
 let winningNumbers: string[] = [];
-let cachedPrizes : string[] = []; // ตัวแปร global สำหรับเก็บหมายเลขที่สุ่มแล้ว
-const { purchasedNumbers } = require('./purchasedNumbers');
-
+let cachedPrizes: string[] = []; // ตัวแปร global สำหรับเก็บหมายเลขที่สุ่มแล้ว
+const { purchasedNumbers } = require("./purchasedNumbers");
 
 router.get("/admin", (req, res) => {
   conn.query(
@@ -45,8 +44,6 @@ router.get("/random", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 
 // insert เลขที่สุ่มแล้ว
 router.post("/lottoWin", (req, res) => {
@@ -85,19 +82,20 @@ router.post("/lottoWin", (req, res) => {
   });
 });
 
-
 router.get("/randomALL3", (req, res) => {
   if (cachedPrizes.length === 0) {
     cachedPrizes = lottoWinAll(); // สุ่มหมายเลขใหม่หากยังไม่มีหมายเลขในตัวแปร
   }
 
   // กรองเลขล็อตเตอรี่ที่ถูกซื้อออก แต่ไม่แก้ไข cachedPrizes เอง
-  const availablePrizes = cachedPrizes.filter(num => !purchasedNumbers.has(num));
+  const availablePrizes = cachedPrizes.filter(
+    (num) => !purchasedNumbers.has(num)
+  );
 
   // ส่งทั้ง availablePrizes และ cachedPrizes กลับไปในอ็อบเจ็กต์เดียว
-  res.status(200).json({ 
+  res.status(200).json({
     winningNumbers: availablePrizes, // เลขที่ยังไม่ได้ซื้อ
-    winningNumbers2: cachedPrizes        // เลขทั้งหมดที่สุ่มไว้
+    winningNumbers2: cachedPrizes, // เลขทั้งหมดที่สุ่มไว้
   });
 });
 
@@ -180,8 +178,28 @@ function lottoWinSold(): Promise<string[]> {
 }
 
 //ดึงข้อมูลมางวดล่าสุดไปหน้า Home
-const moment = require('moment'); // นำเข้า moment.js
-require('moment/locale/th'); // นำเข้า locale ภาษาไทย
+const moment = require("moment"); // นำเข้า moment.js
+require("moment/locale/th"); // นำเข้า locale ภาษาไทย
+
+// router.get("/drawsNow", (req, res) => {
+//   conn.query(
+//     "SELECT * FROM AdminDraws ORDER BY drawID DESC LIMIT 5",
+//     (err, result, fields) => {
+//       if (err) throw err;
+
+//       // กำหนด type ให้กับ result ว่าเป็น array ของ objects
+//       result = result.map((draw: { drawDate: string }) => {
+//         // ปรับปีจาก ค.ศ. เป็น พ.ศ.
+//         let drawDate = moment(draw.drawDate);
+//         let yearBuddhistEra = drawDate.year() + 543;
+//         draw.drawDate = drawDate.format(`DD MMMM ${yearBuddhistEra}`);
+//         return draw;
+//       });
+
+//       res.json(result);
+//     }
+//   );
+// });
 
 router.get("/drawsNow", (req, res) => {
   conn.query(
@@ -189,8 +207,19 @@ router.get("/drawsNow", (req, res) => {
     (err, result, fields) => {
       if (err) throw err;
 
-      // กำหนด type ให้กับ result ว่าเป็น array ของ objects
-      result = result.map((draw: { drawDate: string }) => {
+      // ถ้าไม่มีข้อมูลใน table ให้ส่งค่ากลับตามโครงสร้างของ AdminDrawsGetResponse
+      if (result.length === 0) {
+        let defaultResponse = Array.from({ length: 5 }, (_, index) => ({
+          winningNumber: "xxxxxx", // ค่า placeholder ที่ต้องการ
+          prizeType: index + 1, // รันเลข 1-5
+          drawDate: new Date(), // วันที่ปัจจุบัน (หรือจะกำหนดเป็น null หรือค่าอื่นได้)
+        }));
+
+        return res.json(defaultResponse);
+      }
+
+      // ถ้ามีข้อมูล, กำหนด type ให้กับ result ว่าเป็น array ของ objects
+      result = result.map((draw: { drawDate: any }) => {
         // ปรับปีจาก ค.ศ. เป็น พ.ศ.
         let drawDate = moment(draw.drawDate);
         let yearBuddhistEra = drawDate.year() + 543;
@@ -202,7 +231,3 @@ router.get("/drawsNow", (req, res) => {
     }
   );
 });
-
-
-
-
