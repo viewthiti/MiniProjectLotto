@@ -167,6 +167,7 @@ router.delete("/delete/:id", (req, res) => {
 //   });
  
 // });
+
 //เปลี่ยนรหัสผ่าน
 router.put("/resetpassword/:id", (req, res) => {
   const userId = req.params.id;
