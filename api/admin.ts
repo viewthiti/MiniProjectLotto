@@ -58,12 +58,11 @@ router.post("/lottoWin", (req, res) => {
   }
 
   // แปลงสตริงเป็นตัวเลข
-  const numbers = winningNumbers.map((num) => parseInt(num, 10));
 
   // เตรียมคำสั่ง SQL สำหรับการแทรกหลายแถว
   const sql =
     "INSERT INTO `AdminDraws`(`winningNumber`, `prizeType`, `drawDate`) VALUES ?";
-  const values = numbers.map((number, index) => [number, index + 1, drawDate]);
+  const values = winningNumbers.map((number, index) => [number, index + 1, drawDate]);
 
   conn.query(sql, [values], (err, result) => {
     if (err) {
