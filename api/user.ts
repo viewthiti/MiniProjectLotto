@@ -58,7 +58,7 @@ router.post("/register", (req, res) => {
   }
 
   let checkEmailphoneSql = "SELECT * FROM `Users` WHERE `email` = ? or `phone` = ?";
-  checkEmailphoneSql = mysql.format(checkEmailphoneSql, [users.email, users.email]);
+  checkEmailphoneSql = mysql.format(checkEmailphoneSql, [users.email, users.phone]);
 
   conn.query(checkEmailphoneSql, async (err, results) => {
     if (err) throw err;
@@ -75,7 +75,6 @@ router.post("/register", (req, res) => {
       if (existingPhones.length > 0) {
         errors.push("Phone number already registered.");
       }
-      console.log("Registration error: ", errors);
       return res.status(409).json({ errors });
     }
 
