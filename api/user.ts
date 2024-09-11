@@ -50,7 +50,6 @@ router.post("/login", (req, res) => {
 
 
 router.post("/register", (req, res) => {
-  // Rece data and convert to model
   const users: Users = req.body;
   const wallet: WalletGetResponse = req.body;
 
@@ -76,6 +75,7 @@ router.post("/register", (req, res) => {
       if (existingPhones.length > 0) {
         errors.push("Phone number already registered.");
       }
+      console.log("Registration error: ", errors);
       return res.status(409).json({ errors });
     }
 
